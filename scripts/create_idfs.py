@@ -20,22 +20,107 @@ from eppy import modeleditor
 from eppy.modeleditor import IDF
 import getpass
 
-# pathnameto_eppy = 'c:/eppy'
-pathnameto_eppy = '../'
-sys.path.append(pathnameto_eppy)
-UserName = getpass.getuser()
+def main():
+    # pathnameto_eppy = 'c:/eppy'
+    pathnameto_eppy = '../'
+    sys.path.append(pathnameto_eppy)
+    UserName = getpass.getuser()
 
-#own scripts
-sys.path.append('D:\OneDrive - BuroHappold/01 - EngD/07 - UCL Study/UCLDataScripts')
-from PlotSubmetering import lineno
+    # own scripts
+    sys.path.append('D:\OneDrive - BuroHappold/01 - EngD/07 - UCL Study/UCLDataScripts')
+    from PlotSubmetering import lineno
 
-if sys.platform=='win32':
-    rootdir=os.path.dirname(os.path.abspath(__file__))
-    harddrive_idfs="D:/OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic"
-    idfdir=os.path.dirname(os.path.abspath(__file__))+"\IDFs"
-    epdir="C:/EnergyPlusV8-6-0"
-else:
-    if print_statements is True: print("rootdir not found")
+    if sys.platform == 'win32':
+        rootdir = os.path.dirname(os.path.abspath(__file__))
+        harddrive_idfs = "D:/OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic"
+        idfdir = os.path.dirname(os.path.abspath(__file__)) + "\IDFs"
+        epdir = "C:/EnergyPlusV8-6-0"
+    else:
+        if print_statements is True: print("rootdir not found")
+
+    BuildingAbbreviations = ['MPEB', 'CH', '17', '71', 'Nothing']
+    BuildingHardDisk = ['05_MaletPlaceEngineering_Project', '01_CentralHouse_Project', '02_BuroHappold_17', '03_BuroHappold_71']
+
+    """ WHICH BUILDING AND NO OF SAMPLES """
+    building_num = 1 #0 = MPEB, 1 = CH, 2 = 17, 3 = 71
+    n_samples =  1 # how many idfs need to be created
+    from_samples = 0 #from what number to start creating files (in case i need to stop creation)
+
+    """ TYPE OF SIMULATION """
+    base_case = True #todo run basecase straight away with eppy http://pythonhosted.org/eppy/runningeplus.html
+    simplifications = True #and base_case is True todo if simplification is true, it will use the basecase and any simplification applied.
+    parallel_simulation = False
+    calibrated_case = False
+
+    """ FOR CALIBRATED CASE """
+    time_step = 'month'
+    end_uses = True
+    hourly = True
+
+    """ ADDITIONAL SETTINGS """
+    add_variables = False # these are additional variables written to .eso (which are only done when basecase is true, but can be turned of here if not necessary.
+    remove_sql = True # when doing MPEB, sql is too big (1gb+)
+    save_idfs = True # to create new idfs files or not (in case just to check input generation)
+    print_statements = False
+    vertical_scaling = False
+
+    iddfile = "C:/EnergyPlusV8-6-0/Energy+.idd"
+    IDF.setiddname(iddfile)
+    building_harddisk = BuildingHardDisk[building_num]
+    building_abr = BuildingAbbreviations[building_num]
+
+    if building_abr == 'MPEB':
+        no_variables = 350
+        #todo factor by max of monthly l&p consumption and then -.2 so to allow variation...
+        #                           Jan   Feb   Mar   Apr   May   jun,  jul,  aug,  sept, oct,  nov,  dec
+        seasonal_occ_factor_week = [0.72, 0.66, 0.64, 0.58, 0.74, 0.74, 0.8, 0.77, 0.61, 0.68, 0.66, 0.63] # TODO!!! This is from January to December!!!!
+        seasonal_occ_factor_weekend =  [0.72, .66, 0.64, 0.58, 0.74, 0.74, .8, .77, .61, .68, .66, .63]  # TODO!!! This is from January to December!!!!
+        overtime_multiplier_equip = 85
+        overtime_multiplier_light = 65
+        multiplier_variation = 10
+        run_periods = [[9, 1, 12, 31, '2016', 'Thursday', 'RunPeriod1'], [1, 1, 8, 31, '2017','Sunday', 'RunPeriod2']]  # first month, first day, last month, last day, 'Start Year', Start week, 'Name'
+
+        building_name = 'MaletPlace'
+        if base_case | calibrated_case | simplifications is True:
+            save_dir = harddrive_idfs + "/05_MaletPlaceEngineering_Project/BaseCase/"
+            no_simplifications = 11
+        if parallel_simulation is True:
+            save_dir = harddrive_idfs + "/05_MaletPlaceEngineering_Project/IDFs/"
+
+    elif building_abr == 'CH':
+        no_variables = 300
+        #                           Jan   Feb  Mar   Apr   May   jun,  jul,  aug,  sept, oct,  nov,  dec
+        seasonal_occ_factor_week = [0.63, .67, 0.63, 0.66, 0.60, 0.53, 0.50, 0.48, 0.45, 0.44, 0.63, 0.61]
+        seasonal_occ_factor_weekend = [0.63, .67, 0.63, 0.66, 0.60, 0.53, 0.50, 0.48, 0.45, 0.44, 0.63, 0.61]
+        overtime_multiplier_equip = 65
+        overtime_multiplier_light = 20
+        multiplier_variation = 10
+        run_periods = [[9, 1, 12, 31, '2016', 'Thursday', 'RunPeriod1'], [1, 1, 8, 31, '2017','Sunday', 'RunPeriod2']]  # first month, first day, last month, last day, 'Start Year', Start week, 'Name'
+
+        building_name = 'CentralHouse_222'  # 'MalletPlace', 'CentralHouse_222' # building_name
+        if base_case | calibrated_case | simplifications is True:
+            save_dir = harddrive_idfs + "/01_CentralHouse_Project/BaseCase/"
+            no_simplifications = 9
+        if parallel_simulation is True:
+            save_dir = harddrive_idfs + "/01_CentralHouse_Project/IDFs/"
+
+    if calibrated_case is True:
+        DataPath_model_real = 'D:\OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic/' + building_harddisk + '/ParallelSimulation/'
+        hours = 'hourly' if hourly == True else ''
+        print(DataPath_model_real + 'best_individual' + time_step + str(end_uses) + hours + '.csv')
+        df_calibrated = pd.read_csv(DataPath_model_real + 'best_individual' + time_step + str(end_uses) + hours + '.csv', index_col=0, header=0)
+
+    if not os.path.exists(save_dir):  # check if folder exists
+        os.makedirs(save_dir)  # create new folder
+
+    print("{}".format(rootdir) + "/" + building_name + ".idf")
+    idf1 = IDF("{}".format(rootdir) + "/" + building_name + ".idf")
+    if print_statements is True: print(idf1)
+
+    lhd = doe_lhs.lhs(no_variables, samples=n_samples)
+    print(lhd.shape)
+
+    run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, no_simplifications, remove_sql, add_variables, run_periods, n_samples, from_samples, save_idfs, overtime_multiplier_equip, overtime_multiplier_light, multiplier_variation, seasonal_occ_factor_week, seasonal_occ_factor_weekend)
 
 class DLine(): #use .dline[x] to access different columns in the csv files
     def __init__(self, dline):
@@ -44,7 +129,6 @@ class DLine(): #use .dline[x] to access different columns in the csv files
 
 class Material():
     def __init__(self, dline):  # initialised from line of csv file
-
         self.dline = dline
         self.name = dline[0]
         self.ep_type = dline[1]
@@ -93,8 +177,8 @@ class Material():
                 self.sol_trans = float(dline[41])
                 self.sol_ref = float(dline[42])
                 self.vis_trans = float(dline[43])
-                #self.therm_hem_em = float(dline[45])
-                #self.therm_trans = float(dline[46])
+                # self.therm_hem_em = float(dline[45])
+                # self.therm_trans = float(dline[46])
                 # self.shade_to_glass_dist = float(dline[47])
                 # self.top_opening_mult = float(dline[48])
                 # self.bottom_opening_mult = float(dline[49])
@@ -111,9 +195,6 @@ class Material():
                 self.angle = float(dline[56])
                 self.blind_to_glass_dist = float(dline[57])
 
-#epdir="C:/Users/cvdronke/Dropbox/01 - EngD/07 - UCL Study/01_CentralHouse\Model"
-#csvfile="{0}/{1}/{2}.csv".format(rootdir,indir,fname)
-#iddfile="{0}/Energy+.idd".format(epdir)
 def read_sheet(rootdir, building_abr, base_case, simplifications, run_no,  fname=None):
     sheet = []
 
@@ -988,12 +1069,6 @@ def remove_schedules(idf1, building_abr, base_case, simplifications, run_no): #t
         for i in to_remove[::-1]:
             if print_statements is True: print('remove', idf1.idfobjects[y][i].Name)
             idf1.popidfobject(y, i)
-
-    # for y in schedule_types:
-    #     if print_statements is True: print(len(idf1.idfobjects[y]), "existing schedule objects removed in ", y)
-    #     for i in range(0, len(idf1.idfobjects[y])):
-    #         idf1.popidfobject(y, 0)
-
 
 def remove_existing_outputs(idf1):
     output_types = ["OUTPUT:VARIABLE", "OUTPUT:METER:METERFILEONLY"]
@@ -2217,6 +2292,11 @@ def add_outputs(idf1, base_case, add_variables, building_abr): # add outputvaria
 
 # Remove all comments from idf file so as to make them smaller.
 def remove_comments(run_file):
+    """
+    removes comments from .idf file after writing.
+    :param run_file: .idf file name.
+    :return:
+    """
     with open(run_file, 'r+') as f:
         data = f.readlines()
         for num, line in enumerate(data):
@@ -2264,6 +2344,37 @@ def set_holidays(idf1, building_abr):
         holiday.Special_Day_Type = 'Holiday'
 
 def run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, no_simplifications,  remove_sql, add_variables, run_periods, n_samples, from_samples, save_idfs, overtime_multiplier_equip, overtime_multiplier_light, multiplier_variation, seasonal_occ_factor_week, seasonal_occ_factor_weekend):
+    """
+    # Explanation
+    # 1. replace_materials_eppy uses mat_props.csv, replace_equipment_eppy uses equipment_props.csv, replace_schedules uses house_scheds.csv
+    # 2. adds ground temperatures and output variables
+    # 3. define number of idf files to be created and base model file name
+    # 4. the functions sample the inputs using lhs, inputs are in the csv files to be manually copied
+    # 5. then create separate idf files
+
+    # NOTE:
+    # var_num +=1 implies a new random number for another variable generated with LHS
+    :param idf1:
+    :param lhd:
+    :param building_name:
+    :param building_abr:
+    :param base_case:
+    :param simplifications:
+    :param no_simplifications:
+    :param remove_sql:
+    :param add_variables:
+    :param run_periods:
+    :param n_samples:
+    :param from_samples:
+    :param save_idfs:
+    :param overtime_multiplier_equip:
+    :param overtime_multiplier_light:
+    :param multiplier_variation:
+    :param seasonal_occ_factor_week:
+    :param seasonal_occ_factor_weekend:
+    :return:
+    """
+
     if base_case is False | remove_sql is True:
         idf1.popidfobject('Output:SQLite'.upper(), 0) # remove sql output, have all the outputs in the .eso and meter data in .mtr
     idf1.popidfobject('Output:VariableDictionary'.upper(), 0)
@@ -2286,15 +2397,6 @@ def run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, 
 
     add_outputs(idf1, base_case, add_variables, building_abr)
 
-    # Explanation
-    # 1. replace_materials_eppy uses mat_props.csv, replace_equipment_eppy uses equipment_props.csv, replace_schedules uses house_scheds.csv
-    # 2. adds ground temperatures and output variables
-    # 3. define number of idf files to be created and base model file name
-    # 4. the functions sample the inputs using lhs, inputs are in the csv files to be manually copied
-    # 5. then create separate idf files
-
-    # NOTE:
-    # var_num +=1 implies a new random number for another variable generated with LHS
 
     occ_schedules = []
     light_schedules = []
@@ -2318,8 +2420,6 @@ def run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, 
             run_file = save_dir + building_name + "_basecase.idf"  # use new folder for save location, zero pad to 4 numbers
         if simplifications is True:
             run_file = save_dir + "/" + building_name + "simplification_" + str(run_no) + ".idf"  # use new folder for save location, zero pad to 4 numbers
-        if base_case is True and diagnose_basecase is True:
-            run_file = save_dir + building_name + "_diagnose_basecase.idf"  # use new folder for save location, zero pad to 4 numbers
         if parallel_simulation is True:
             run_file = save_dir + "/" + building_name + "_" + str(format(run_no, '04')) + ".idf"  # use new folder for save location, zero pad to 4 numbers
         elif calibrated_case:
@@ -2383,141 +2483,7 @@ def run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, 
 
     df_inputs.to_csv(csv_outfile[:-4]+'final.csv', index=False)
 
-def main():
 
-    BuildingAbbreviations = ['MPEB', 'CH', '17', '71', 'Nothing']
-    BuildingHardDisk = ['05_MaletPlaceEngineering_Project', '01_CentralHouse_Project', '02_BuroHappold_17', '03_BuroHappold_71']
-
-    """ WHICH BUILDING AND NO OF SAMPLES """
-    building_num = 1 #0 = MPEB, 1 = CH, 2 = 17, 3 = 71
-    n_samples =  1 # how many idfs need to be created
-    from_samples = 0 #from what number to start creating files (in case i need to stop creation)
-
-    """ TYPE OF SIMULATION """
-    base_case = True #todo run basecase straight away with eppy http://pythonhosted.org/eppy/runningeplus.html
-    simplifications = True #and base_case is True todo if simplification is true, it will use the basecase and any simplification applied.
-    parallel_simulation = False
-    calibrated_case = False
-    diagnose_basecase = False # if both base_case and diagnose_basecase are true, simulate a summer and winterday
-
-    """ FOR CALIBRATED CASE """
-    time_step = 'month'
-    end_uses = True
-    hourly = True
-
-    """ ADDITIONAL SETTINGS """
-    add_variables = False # these are additional variables written to .eso (which are only done when basecase is true, but can be turned of here if not necessary.
-    remove_sql = True # when doing MPEB, sql is too big (1gb+)
-    save_idfs = True # to create new idfs files or not (in case just to check input generation)
-    print_statements = False
-    vertical_scaling = False
-
-    iddfile = "C:/EnergyPlusV8-6-0/Energy+.idd"
-    IDF.setiddname(iddfile)
-    building_harddisk = BuildingHardDisk[building_num]
-    building_abr = BuildingAbbreviations[building_num]
-
-    if building_abr == 'MPEB':
-        no_variables = 350
-        #todo factor by max of monthly l&p consumption and then -.2 so to allow variation...
-        #                           Jan   Feb   Mar   Apr   May   jun,  jul,  aug,  sept, oct,  nov,  dec
-        seasonal_occ_factor_week = [0.72, 0.66, 0.64, 0.58, 0.74, 0.74, 0.8, 0.77, 0.61, 0.68, 0.66, 0.63] # TODO!!! This is from January to December!!!!
-        seasonal_occ_factor_weekend =  [0.72, .66, 0.64, 0.58, 0.74, 0.74, .8, .77, .61, .68, .66, .63]  # TODO!!! This is from January to December!!!!
-        overtime_multiplier_equip = 85
-        overtime_multiplier_light = 65
-        multiplier_variation = 10
-        run_periods = [[9, 1, 12, 31, '2016', 'Thursday', 'RunPeriod1'], [1, 1, 8, 31, '2017','Sunday', 'RunPeriod2']]  # first month, first day, last month, last day, 'Start Year', Start week, 'Name'
-
-        building_name = 'MaletPlace'
-        if base_case | calibrated_case | simplifications is True:
-            save_dir = harddrive_idfs + "/05_MaletPlaceEngineering_Project/BaseCase/"
-            no_simplifications = 11
-        if parallel_simulation is True:
-            save_dir = harddrive_idfs + "/05_MaletPlaceEngineering_Project/IDFs/"
-
-        if diagnose_basecase is True:
-            save_dir = harddrive_idfs + "/05_MaletPlaceEngineering_Project/Diagnosis/"
-            run_periods = [[1, 9, 1, 15, '2017', 'Sunday', 'Winter'], [7, 10, 7, 16, '2017', 'Sunday', 'Summer']]
-            add_variables = True # these are additional variables written to .eso (which are only done when basecase is true, but can be turned of here if not necessary.
-            remove_sql = False # when doing MPEB, sql is too big (1gb+)
-
-    elif building_abr == 'CH':
-        no_variables = 300
-        #                           Jan   Feb  Mar   Apr   May   jun,  jul,  aug,  sept, oct,  nov,  dec
-        seasonal_occ_factor_week = [0.63, .67, 0.63, 0.66, 0.60, 0.53, 0.50, 0.48, 0.45, 0.44, 0.63, 0.61]
-        seasonal_occ_factor_weekend = [0.63, .67, 0.63, 0.66, 0.60, 0.53, 0.50, 0.48, 0.45, 0.44, 0.63, 0.61]
-        overtime_multiplier_equip = 65
-        overtime_multiplier_light = 20
-        multiplier_variation = 10
-        run_periods = [[9, 1, 12, 31, '2016', 'Thursday', 'RunPeriod1'], [1, 1, 8, 31, '2017','Sunday', 'RunPeriod2']]  # first month, first day, last month, last day, 'Start Year', Start week, 'Name'
-
-        building_name = 'CentralHouse_222'  # 'MalletPlace', 'CentralHouse_222' # building_name
-        if base_case | calibrated_case | simplifications is True:
-            save_dir = harddrive_idfs + "/01_CentralHouse_Project/BaseCase/"
-            no_simplifications = 9
-        if parallel_simulation is True:
-            save_dir = harddrive_idfs + "/01_CentralHouse_Project/IDFs/"
-        if base_case is True and diagnose_basecase is True:
-            save_dir = harddrive_idfs + "/01_CentralHouse_Project/Diagnosis/"
-            run_periods = [[1, 9, 1, 15, '2017', 'Sunday', 'Winter'], [7, 10, 7, 16, '2017', 'Sunday', 'Summer']]
-            add_variables = True # these are additional variables written to .eso (which are only done when basecase is true, but can be turned of here if not necessary.
-            remove_sql = False # when doing MPEB, sql is too big (1gb+)
-
-    elif building_abr == '71':
-        no_variables = 300 # make sure there are more than necessary
-        seasonal_occ_factor_week = [1 for i in range(1, 13)] # TODO!!! This is from January to December!!!!
-        seasonal_occ_factor_weekend = [1 for i in range(1, 13)] # TODO!!! This is from January to December!!!!
-        overtime_multiplier_equip = 20 # not used
-        overtime_multiplier_light = 15 # not used
-        multiplier_variation = 20 # not used
-        run_periods = [[1, 1, 12, 31, '2012', 'Sunday', 'RunPeriod1']] # first month, first day, last month, last day, 'Start Year', Start week, 'Name'
-
-        building_name = 'BH71'
-        if base_case | calibrated_case | simplifications is True:
-            save_dir = harddrive_idfs + "/03_BuroHappold_71/BaseCase/"
-            no_simplifications = 6
-        else:
-            save_dir = harddrive_idfs + "/03_BuroHappold_71/IDFs/"
-
-    if calibrated_case is True:
-        DataPath_model_real = 'D:\OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic/' + building_harddisk + '/ParallelSimulation/'
-        hours = 'hourly' if hourly == True else ''
-        print(hours)
-        print(DataPath_model_real + 'best_individual' + time_step + str(end_uses) + hours + '.csv')
-        df_calibrated = pd.read_csv(DataPath_model_real + 'best_individual' + time_step + str(end_uses) + hours + '.csv', index_col=0, header=0)
-        #df_calibrated = pd.DataFrame(df_calibrated.iloc[-1]) #last calibrated individual
-
-        print(df_calibrated.columns.tolist())
-        print(len(df_calibrated.columns.tolist()))
-        print(pd.DataFrame(df_calibrated).T)
-
-        # print(df_calibrated.iloc[0]["Design Specification Outdoor Air 1"])#, df_calibrated.columns.tolist()))
-
-        # months_in_year = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'O0ct', 'Nov', 'Dec']
-        # seasonal_occ_factor_week_names = [str('SeasonWeekOccFactor_') + str(month) for month in months_in_year]
-        # seasonal_occ_factor_weekend_names = [str('SeasonWeekendOccFactor_') + str(month) for month in months_in_year]
-        # seasonal_occ_factor_week = [df_calibrated.iloc[0][i] for i in seasonal_occ_factor_week_names]
-        # seasonal_occ_factor_weekend = [df_calibrated.iloc[0][i] for i in seasonal_occ_factor_weekend_names]
-        #
-        # if building_abr == '71':
-        #     overtime_multiplier_equip = 20 # not used
-        #     overtime_multiplier_light = 15 # not used
-
-    if not os.path.exists(save_dir):  # check if folder exists
-        os.makedirs(save_dir)  # create new folder
-
-    print("{}".format(rootdir) + "/" + building_name + ".idf")
-    idf1 = IDF("{}".format(rootdir) + "/" + building_name + ".idf")
-    if print_statements is True: print(idf1)
-
-    lhd = doe_lhs.lhs(no_variables, samples=n_samples)
-    print(lhd.shape)
-
-    run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, no_simplifications, remove_sql, add_variables, run_periods, n_samples, from_samples, save_idfs, overtime_multiplier_equip, overtime_multiplier_light, multiplier_variation, seasonal_occ_factor_week, seasonal_occ_factor_weekend)
-
-    # if print_statements is True: print idf1.idfobjects['PEOPLE'][0].objls #fieldnames
-    # if print_statements is True: print idf1.idfobjects['ELECTRICEQUIPMENT'][0].objls #fieldnames
-    # if print_statements is True: print idf1.idfobjects['LIGHTS'][0].fieldnames
 
 if __name__ == '__main__':
     def start__main__():

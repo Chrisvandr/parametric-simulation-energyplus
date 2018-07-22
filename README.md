@@ -5,7 +5,7 @@ Parametric building performance simulation using Python for EnergyPlus
 
 Copies and manipulates existing .idf files for Monte Carlo simulation (i.e. uses random sampling techniques to create multiple .idf files to then be run in EnergyPlus).
 
-### : data_files.dir
+### dir data_files
 
 Store .csv files in here for the variable parameters with their defined mean and standard deviations.
 
@@ -13,7 +13,7 @@ Store .csv files in here for the variable parameters with their defined mean and
 - mat_props.csv (materials)
 - house_scheds.csv (schedules)
 
-### : IDFs.dir
+### dir IDFs
 
 This is where the `.idf` files are stored.
 
@@ -29,9 +29,8 @@ Project specific. This will read measurement data from .csv files extracted from
 
 Perform sensitivity analysis on the predictions, uses the read_predictions to get the eplusmtr.csv results and correlates these with the input parameters generated during random sampling.
 
-
 <figure>
-<img src="./assets/_HeatMapCorrelations.png" width="500">
+<img src="./assets/BoxPlot.png" width="800">
 </figure>
 
 <figure>
@@ -39,5 +38,21 @@ Perform sensitivity analysis on the predictions, uses the read_predictions to ge
 </figure>
 
 <figure>
-<img src="./assets/BoxPlot.png" width="800">
+<img src="./assets/_HeatMapCorrelations.png" width="500">
+</figure>
+
+## __compare_timeseries_datasets.py__
+
+Script to visualise and compare two datasets, in particular in this case predicted and measured energy use.
+
+<figure>
+<img src="./assets/WeekdayAreaPlot.png" width="500">
+</figure>
+
+<figure>
+<img src="./assets/Energy_HeatMap.png" width="500">
+</figure>
+
+<figure>
+<img src="./assets/MonthlyBarPlotSingle_PredictedvsMeasured.png" width="500">
 </figure>

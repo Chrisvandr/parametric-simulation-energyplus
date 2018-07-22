@@ -1,0 +1,63 @@
+,,"1 = all the heat is kept in the zone, 0 = all heat lost to external",Fraction of Heat released as water,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,EquipmentLevel,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,Watts/Area,,,,,,,,,,,,,,,
+,,,,Unit Power (W),Appliance level Multiplier (NOT USED),,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+Appliance,EP_purpose,Useful Gains,Fraction latent,Design Level (W) ,Gross Rated Cooling COP,Gross Rated Heating COP,Efficiency,Peak_Flow_Rate,4,5,6,7,8,9,10,PM25(mg/min),PM10(mg/min),NO2(mug/s),Calculation Method,Notes,watts per zone floor area [w/m2],watts per person [w/p],fraction radiant,fraction lost,occupancy [m2/p],flow per exterior surface m3/s-m2,flow rate per person m3/s-p,,,sigma,lower,upper,,
+Office_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,6.224188776,,,,,1.244837755,2.48967551,9.958702041,20,
+Circulation_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,13.83153061,,,,,2.766306122,5.532612245,22.13044898,20,
+Meeting_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,6.224188776,,,,,1.244837755,2.48967551,9.958702041,20,
+Server_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,6.224188776,,,,,1.244837755,2.48967551,9.958702041,20,
+Reception_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,8.298918367,,,,,1.659783673,3.319567347,13.27826939,20,
+ComputerCluster_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,4.841035714,,,,,0.968207143,1.936414286,7.745657143,20,
+Library_People,People,,,,,,,,,,,,,,,,,,Area/Person,,,,,,6.224188776,,,,,1.244837755,2.48967551,9.958702041,20,
+Office_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,10.15455409,,,,,,,,,2.030910819,4.061821638,16.24728655,20,
+Circulation_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,7.976878613,,,,,,,,,1.595375723,3.190751445,12.76300578,20,
+Meeting_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,19.29041853,,,,,,,,,3.858083705,7.71616741,30.86466964,20,
+Server_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,15.07246377,,,,,,,,,3.014492754,6.028985507,24.11594203,20,
+Reception_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,11.73269896,,,,,,,,,2.346539792,4.693079585,18.77231834,20,
+ComputerCluster_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,16.06860158,,,,,,,,,3.213720317,6.427440633,25.70976253,20,
+Library_Lighting,Lights,,,,,,,,,,,,,,,,,,Watts/Area,,7.918178819,,,,,,,,,1.583635764,3.167271528,12.66908611,20,
+Office_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,12,,,,,,,,,2.4,4.8,19.2,20,
+Circulation_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,3,,,,,,,,,0.6,1.2,4.8,20,
+Meeting_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,10,,,,,,,,,2,4,16,20,
+Server_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,250,,,,,,,,,50,100,400,20,
+Reception_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,8,,,,,,,,,1.6,3.2,12.8,20,
+ComputerCluster_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,14,,,,,,,,,2.8,5.6,22.4,20,
+Library_Equipment,ElectricEquipment,,,,,,,,,,,,,,,,,,Watts/Area,,12,,,,,,,,,2.4,4.8,19.2,20,
+Office_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Circulation_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Storage_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Lavatory_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Meeting_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Lift_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Kitchen_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Server_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Shower_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+LectureTheatre_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Plant_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Reception_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+ComputerCluster_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+PrintRoom_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+Library_Infiltration,ZoneInfiltration:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/ExteriorArea,,,,,,,0.000860649,,,,0.00017213,0.00034426,0.001377038,20,
+ZoneVentilation,ZoneVentilation:DesignFlowRate,,,,,,,,,,,,,,,,,,Flow/Person,,,,,,,,0.008,,,0.0016,0.0032,0.0128,20,
+Boiler1,Boiler:HotWater,,,,,,0.93,,,,,,,,,,,,,,,,,,,,,,,0.186,0.65,0.98,20,
+Boiler2,Boiler:HotWater,,,,,,0.93,,,,,,,,,,,,,,,,,,,,,,,0.186,0.65,0.98,20,
+ExhaustFans,Fan:ZoneExhaust,,,,,,0.6,,,,,,,,,,,,,,,,,,,,,,,0.12,0.24,0.96,20,
+Fixture_Cleaners,WaterUse:Equipment,,,,,,,1.48E-05,,,,,,,,,,,,,,,,,,,,,,2.96E-06,5.91E-06,2.36E-05,20,
+Fixture_MaleToilets,WaterUse:Equipment,,,,,,,0.000023,,,,,,,,,,,,,,,,,,,,,,0.0000046,0.0000092,0.0000368,20,
+Fixture_FemaleToilets,WaterUse:Equipment,,,,,,,0.000023,,,,,,,,,,,,,,,,,,,,,,0.0000046,0.0000092,0.0000368,20,
+Fixture_Kitchenettes,WaterUse:Equipment,,,,,,,2.11E-05,,,,,,,,,,,,,,,,,,,,,,4.22E-06,8.44E-06,3.38E-05,20,
+Fixture_DisabledToilets,WaterUse:Equipment,,,,,,,4.31E-06,,,,,,,,,,,,,,,,,,,,,,8.63E-07,0.000001725,0.0000069,20,
+Fixture_Showers,WaterUse:Equipment,,,,,,,0.000076,,,,,,,,,,,,,,,,,,,,,,0.0000152,0.0000304,0.0001216,20,
+VRVBasement,AirConditioner:VariableRefrigerantFlow,,,,3.75,4.11,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVGround,AirConditioner:VariableRefrigerantFlow,,,,3.16,3.87,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVFirst,AirConditioner:VariableRefrigerantFlow,,,,3.62,4.04,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVSecond,AirConditioner:VariableRefrigerantFlow,,,,3.49,3.97,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVThirdFrontAndMiddle,AirConditioner:VariableRefrigerantFlow,,,,3.19,3.91,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVThirdRear,AirConditioner:VariableRefrigerantFlow,,,,3.19,3.91,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVFourth,AirConditioner:VariableRefrigerantFlow,,,,3.19,3.91,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVFifthFront,AirConditioner:VariableRefrigerantFlow,,,,3.19,3.91,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVFifthMiddle,AirConditioner:VariableRefrigerantFlow,,,,3.19,3.91,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVFifthRear,AirConditioner:VariableRefrigerantFlow,,,,3.19,3.91,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…
+VRVSixth,AirConditioner:VariableRefrigerantFlow,,,,3.84,4.24,,,,,,,,,,,,,,,,,,,,,,,,,,,5,uses the percentage and does the sigma calc in the script…

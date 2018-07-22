@@ -306,8 +306,6 @@ if __name__ == '__main__':
         print('start')
 
 
-
-
     start__main__()
 
     from read_predictions import readRuns, readInputs

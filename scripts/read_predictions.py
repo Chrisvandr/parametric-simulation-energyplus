@@ -11,6 +11,7 @@ def readRuns(parallel_runs_harddisk, time_step, NO_ITERATIONS):
     :param NO_ITERATIONS: number of files to include in new dataframe.
     :return:
     """
+
     def strip_columns(df):
         """
         Rename columns of loaded eplusmtr file
