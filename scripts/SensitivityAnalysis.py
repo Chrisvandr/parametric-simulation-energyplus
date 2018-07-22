@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from matplotlib import *
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm #color map
 import getpass
