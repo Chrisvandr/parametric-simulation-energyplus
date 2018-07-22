@@ -11,34 +11,61 @@ import itertools
 import matplotlib.ticker as ticker
 # import statsmodels.api as sm
 
-from read_predictions import ReadRuns
+def main():
+    BuildingList = ['05_MaletPlaceEngineering', '01_CentralHouse', '02_BuroHappold_17', '03_BuroHappold_71']  # Location of DATA
+    BuildingHardDisk = ['05_MaletPlaceEngineering_Project', '01_CentralHouse_Project', '02_BuroHappold_17','03_BuroHappold_71']
+    DataFilePaths = ['MPEB', 'CentralHouse', '17', '71']  # Location of STM data and file naming
+    BuildingLabels = ['MPEB', 'CH', 'Office 17', 'Office 71']
+    BuildingAbbreviations = ['MPEB', 'CH', '17', '71', 'Nothing']
+    InputVariables = ['inputs_MaletPlace_FINAL.csv', 'inputs_CentralHouse_222_29_11_15_02_2870.csv', 'Inputs.csv', 'inputs_BH71_27_09_13_46.csv']
+    FloorAreas = [9579, 5876, 1924, 1691]
+    NO_ITERATIONS = [3000, 2870, 100, 100]
+
+    building_num = 1  # 0 = MPEB, 1 = CH, 2 = 17, 3 = 71
+    time_step = 'year' # month or year
+
+    building_abr = BuildingAbbreviations[building_num]
+    datafile = DataFilePaths[building_num]
+    building_label = BuildingLabels[building_num]
+    floor_area = FloorAreas[building_num]
+    building_harddisk = BuildingHardDisk[building_num]
+    NO_ITERATIONS = NO_ITERATIONS[building_num]
+    inputs = InputVariables[building_num]
+
+    parallel_runs_harddisk = start_path + 'OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic/' + building_harddisk + '/ParallelSimulation/Eplusmtr/'
+    DataPath_model_real = start_path + 'OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic/' + building_harddisk + '/ParallelSimulation/'
+    DataPathImages = start_path + 'OneDrive - BuroHappold/01 - EngD/01 - Thesis/02_Images/'
+
+    to_hdf = False
+    if to_hdf:
+        runs_outputs = readRuns(parallel_runs_harddisk, time_step=time_step, NO_ITERATIONS=NO_ITERATIONS)
+        print(runs_outputs.head())
+        runs_outputs.to_hdf(DataPath_model_real + building_abr+ '_' + str(NO_ITERATIONS) +'_RUNS_' + time_step + '.hdf', 'runs', mode='w')
+
+    runs_outputs = pd.read_hdf(DataPath_model_real + building_abr+ '_' + str(NO_ITERATIONS) +'_RUNS_' + time_step + '.hdf', 'runs')
+    Y_real = runs_outputs.as_matrix()
+    cols_outputs = runs_outputs.columns.tolist()
+
+    runs_inputs = readInputs(DataPath_model_real, parallel_runs_harddisk, inputs, NO_ITERATIONS)
+    X_real = runs_inputs.as_matrix()
+    cols_inputs = runs_inputs.columns.tolist()
+
+    # X_real_data = np.vstack((cols_inputs, X_real))
+    # Y_real_data = np.vstack((cols_outputs, Y_real))
+    #input_outputs = np.hstack((X_real_data, Y_real_data))
+    #pd.DataFrame(input_outputs).to_csv(DataPath_model_real + 'input_outputs_' + time_step + '.csv', header=None)
+
+    df_corr_stnd, df_corr_spearman, df_corr_pearson = calculateCorrelations(DataPath_model_real, X_real, Y_real, cols_outputs, cols_inputs)
+
+    #heatmapCorrelations(df_corr_pearson, runs_outputs, DataPathImages)
+    #scatterCorrelation(runs_inputs[['WeekdayLandPsched_Offset']], runs_outputs[['Cooling']]/floor_area, input_label='L&P profile offset (per 30Min)', output_label='Cooling $\mathregular{(kWh/m^{2}a)}$', DataPathImages)
+    boxplotPredictions(runs_outputs/floor_area, time_step, DataPathImages)
+
+    plt.show()
 
 
-def ImportOutputs(DataPath_model_real, inputs):
-    not_run = []
-    run_numbers = []
 
-    for i in range(NO_ITERATIONS):
-        file_name = 'eplusmtr' + str(format(i, '04')) + '.csv'
-        if os.path.isfile(os.path.join(parallel_runs_harddisk, file_name)):
-            run_numbers.append(i)
-        else:
-            not_run.append(str(format(i, '04')))
-
-    df = pd.read_csv(DataPath_model_real + inputs, header=0)
-    cols_inputs = df.columns.tolist()
-    df_in = df.copy()
-
-    runs_no_inputs = pd.DataFrame(["%.2d" % x for x in (np.arange(0, df.shape[0]))])
-    df = pd.concat([runs_no_inputs, df], axis=1, ignore_index=True)
-
-    X_real = df.ix[run_numbers]
-    X_real = X_real.drop(df.columns[[0]], axis=1)  # drop run_no column
-    X_real = X_real.as_matrix()
-
-    return X_real, cols_inputs
-
-def CalculateCorrelations(DataPath_model_real, X_real, Y_real, cols_outputs, cols_inputs):
+def calculateCorrelations(DataPath_model_real, X_real, Y_real, cols_outputs, cols_inputs):
     cols_outputs.append('Total')
     Y_real = pd.DataFrame(pd.concat([pd.DataFrame(Y_real), pd.DataFrame(Y_real.sum(axis=1), columns=['Total'])], axis=1))
     Y_real = Y_real.as_matrix()
@@ -72,8 +99,7 @@ def CalculateCorrelations(DataPath_model_real, X_real, Y_real, cols_outputs, col
 
     return df_corr_stnd, df_corr_spearman, df_corr_pearson
 
-def ScatterCorrelation(df_inputs, df_outputs, input_label, output_label):
-    df_outputs = df_outputs/floor_area
+def scatterCorrelation(df_inputs, df_outputs, input_label, output_label, DataPathImages):
 
     df_in = df_inputs.columns.tolist()
     df_out = df_outputs.columns.tolist()
@@ -121,7 +147,7 @@ def ScatterCorrelation(df_inputs, df_outputs, input_label, output_label):
         ax.set_title('$R^2 = %0.2f$'% Rsqr, fontsize=9)
     plt.savefig(DataPathImages + '_ScatterSingleVariable.png', dpi=300, bbox_inches='tight')
 
-def BoxPlotPredictions(runs, time_step): # for multiple runs
+def boxplotPredictions(runs, time_step, DataPathImages): # for multiple runs
     """
     :param runs: Pandas DataFrame of predictions (i.e. combined eplusmtr results)
     :param time_step: 'month' or 'year'
@@ -130,7 +156,7 @@ def BoxPlotPredictions(runs, time_step): # for multiple runs
 
     if time_step == 'year':
         no_end_uses = len(runs.columns)
-        fig = plt.figure(figsize=(14 / 2.54, 8 / 2.54)) #width and height
+        fig = plt.figure(figsize=(18 / 2.54, 8 / 2.54)) #width and height
         ax2 = plt.subplot2grid((1, no_end_uses+1), (0, 0))
         ax = plt.subplot2grid((1, no_end_uses+1), (0, 1), colspan=no_end_uses)
 
@@ -161,7 +187,6 @@ def BoxPlotPredictions(runs, time_step): # for multiple runs
                         box.set(color=colors[0], linewidth=1.5)
             [i.set(color='black') for i in bplot['medians']]
 
-
         fig.subplots_adjust(wspace=1)
 
         ax2.set_ylabel('Energy $\mathregular{(kWh/m^{2}a)}$')
@@ -169,7 +194,6 @@ def BoxPlotPredictions(runs, time_step): # for multiple runs
         ax2.yaxis.grid(b=True, which='major', color='black', linestyle='--', alpha=.4)
         ax.set_axisbelow(True)
         ax2.set_axisbelow(True)
-        plt.savefig(DataPathImages + '_boxplot_year.png', dpi=300, bbox_inches='tight')
 
     if time_step == 'month':
         cols = runs.columns.tolist()
@@ -209,9 +233,9 @@ def BoxPlotPredictions(runs, time_step): # for multiple runs
         axes[0].set_title('Energy $\mathregular{(kWh/m^{2}a)}$', fontsize=9)
         axes[len(end_uses)-1].xaxis.set_major_formatter(ticker.FixedFormatter(ticklabels))
 
-        plt.savefig(DataPathImages + '_boxplot_month.png', dpi=300, bbox_inches='tight')
+        plt.savefig(DataPathImages + time_step + '_boxplot.png', dpi=300, bbox_inches='tight')
 
-def HeatmapCorrelations(df, runs):
+def heatmapCorrelations(df, runs, DataPathImages):
     df_perc_total = [i / runs.mean(axis=0).sum() for i in runs.mean(axis=0)]
     df_perc_total.append(1) # for the total, which is 100%
 
@@ -277,11 +301,16 @@ def HeatmapCorrelations(df, runs):
 
     plt.savefig(DataPathImages +  '_HeatMapCorrelations.png', dpi=400, bbox_inches='tight')
 
-
 if __name__ == '__main__':
-    def start():
+    def start__main__():
         print('start')
-    start()
+
+
+
+
+    start__main__()
+
+    from read_predictions import readRuns, readInputs
 
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#8c564b', '#d62728', '#9467bd', '#aec7e8', '#ffbb78', '#98df8a',
               '#c49c94', '#ff9896', '#c5b0d5', '#1f77b4', '#ff7f0e', '#2ca02c', '#8c564b', '#d62728', '#9467bd',
@@ -293,55 +322,4 @@ if __name__ == '__main__':
     else:
         start_path = 'D:/'
 
-    BuildingList = ['05_MaletPlaceEngineering', '01_CentralHouse', '02_BuroHappold_17', '03_BuroHappold_71']  # Location of DATA
-    BuildingHardDisk = ['05_MaletPlaceEngineering_Project', '01_CentralHouse_Project', '02_BuroHappold_17','03_BuroHappold_71']
-    DataFilePaths = ['MPEB', 'CentralHouse', '17', '71']  # Location of STM data and file naming
-    BuildingLabels = ['MPEB', 'CH', 'Office 17', 'Office 71']
-    BuildingAbbreviations = ['MPEB', 'CH', '17', '71', 'Nothing']
-    InputVariables = ['inputs_MaletPlace_FINAL.csv', 'inputs_CentralHouse_222_29_11_15_02_2870.csv', 'Inputs.csv', 'inputs_BH71_27_09_13_46.csv']
-    FloorAreas = [9579, 5876, 1924, 1691]
-    NO_ITERATIONS = [3000, 2870, 100, 100]
-
-    building_num = 1  # 0 = MPEB, 1 = CH, 2 = 17, 3 = 71
-    time_step = 'year' # month or year
-
-    building_abr = BuildingAbbreviations[building_num]
-    datafile = DataFilePaths[building_num]
-    building_label = BuildingLabels[building_num]
-    floor_area = FloorAreas[building_num]
-    building_harddisk = BuildingHardDisk[building_num]
-    NO_ITERATIONS = NO_ITERATIONS[building_num]
-    inputs = InputVariables[building_num]
-
-    parallel_runs_harddisk = start_path + 'OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic/' + building_harddisk + '/ParallelSimulation/Eplusmtr/'
-    DataPath_model_real = start_path + 'OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic/' + building_harddisk + '/ParallelSimulation/'
-    DataPathImages = start_path + 'OneDrive - BuroHappold/01 - EngD/01 - Thesis/02_Images/'
-
-    to_hdf = False
-    if to_hdf:
-        runs_outputs = ReadRuns(parallel_runs_harddisk, time_step=time_step, NO_ITERATIONS=NO_ITERATIONS)
-        print(runs_outputs.head())
-
-        runs_outputs.to_hdf(DataPath_model_real + building_abr+ '_' + str(NO_ITERATIONS) +'_RUNS_' + time_step + '.hdf', 'runs', mode='w')
-
-    runs_outputs = pd.read_hdf(DataPath_model_real + building_abr+ '_' + str(NO_ITERATIONS) +'_RUNS_' + time_step + '.hdf', 'runs')
-    cols_outputs = runs_outputs.columns.tolist()
-
-    Y_real = runs_outputs.as_matrix()
-    X_real, cols_inputs = ImportOutputs(DataPath_model_real, inputs)
-
-    runs_inputs = pd.DataFrame(X_real, columns=cols_inputs)
-
-    # X_real_data = np.vstack((cols_inputs, X_real))
-    # Y_real_data = np.vstack((cols_outputs, Y_real))
-    #input_outputs = np.hstack((X_real_data, Y_real_data))
-    #pd.DataFrame(input_outputs).to_csv(DataPath_model_real + 'input_outputs_' + time_step + '.csv', header=None)
-
-    df_corr_stnd, df_corr_spearman, df_corr_pearson = CalculateCorrelations(DataPath_model_real, X_real, Y_real, cols_outputs, cols_inputs)
-
-    #HeatmapCorrelations(df_corr_pearson, runs)
-    #ScatterCorrelation(runs_inputs[['WeekdayLandPsched_Offset']], runs_outputs[['Cooling']], input_label='L&P profile offset (per 30Min)', output_label='Cooling $\mathregular{(kWh/m^{2}a)}$')
-    BoxPlotPredictions(runs_outputs/floor_area, time_step)
-
-    plt.show()
-
+    main()

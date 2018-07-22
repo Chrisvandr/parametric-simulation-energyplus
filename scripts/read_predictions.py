@@ -2,15 +2,8 @@ import re
 import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm #color map
-import getpass
-import seaborn as sns
-from scipy.stats import spearmanr, pearsonr, sem
-import itertools
-import matplotlib.ticker as ticker
 
-def ReadRuns(parallel_runs_harddisk, time_step, NO_ITERATIONS):
+def readRuns(parallel_runs_harddisk, time_step, NO_ITERATIONS):
     """
     Read eplusmtr files in a folder and combine them in one dataframe, formatted based on time_step.
     :param parallel_runs_harddisk: location of eplusmtr.csv files.
@@ -121,3 +114,34 @@ def ReadRuns(parallel_runs_harddisk, time_step, NO_ITERATIONS):
                 runs = runs.T
 
     return runs
+
+def readInputs(DataPath_model_real, parallel_runs_harddisk, inputs, NO_ITERATIONS):
+    """
+    Read .csv file with inputs for each run created by create_idfs.py
+    Return df of input parameter values and names per run.
+    :param DataPath_model_real: path to .csv file
+    :param parallel_runs_harddisk: path to dir containing eplusmtr.csv files.
+    :param inputs: name of .csv file
+    :param NO_ITERATIONS: no. iterations to take from file.
+    :return: return parameter values per run as a DataFrame, header contains the input parameter names.
+    """
+    not_run = []
+    run_numbers = []
+
+    for i in range(NO_ITERATIONS):
+        file_name = 'eplusmtr' + str(format(i, '04')) + '.csv'
+        if os.path.isfile(os.path.join(parallel_runs_harddisk, file_name)):
+            run_numbers.append(i)
+        else:
+            not_run.append(str(format(i, '04')))
+
+    df = pd.read_csv(DataPath_model_real + inputs, header=0)
+    cols_inputs = df.columns.tolist()
+
+    runs_no_inputs = pd.DataFrame(["%.2d" % x for x in (np.arange(0, df.shape[0]))])
+    df = pd.concat([runs_no_inputs, df], axis=1, ignore_index=True)
+
+    df = df.ix[run_numbers]
+    df = df.drop(df.columns[[0]], axis=1)  # drop run_no column
+
+    return df

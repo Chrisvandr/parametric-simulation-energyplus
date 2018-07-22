@@ -27,6 +27,17 @@ Project specific. This will read measurement data from .csv files extracted from
 
 ## __sensitivity_analysis.py__
 
-Will run sensitivity analysis on the predictions, uses the read_predictions to get the eplusmtr.csv results and correlates these with the input parameters generated during random sampling.
+Perform sensitivity analysis on the predictions, uses the read_predictions to get the eplusmtr.csv results and correlates these with the input parameters generated during random sampling.
 
-![scatter_single](../images/ScatterSingleVariable.png)
+
+<figure>
+<img src="./assets/_HeatMapCorrelations.png" width="500">
+</figure>
+
+<figure>
+<img src="./assets/ScatterSingleVariable.png" width="250">
+</figure>
+
+<figure>
+<img src="./assets/BoxPlot.png" width="800">
+</figure>

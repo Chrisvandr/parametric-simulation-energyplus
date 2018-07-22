@@ -30,11 +30,8 @@ sys.path.append('D:\OneDrive - BuroHappold/01 - EngD/07 - UCL Study/UCLDataScrip
 from PlotSubmetering import lineno
 
 if sys.platform=='win32':
-    #if print_statements is True: print("Operating System: Windows")
-    #rootdir="/".join(__file__.split('\\')[:-1])
     rootdir=os.path.dirname(os.path.abspath(__file__))
     harddrive_idfs="D:/OneDrive - BuroHappold\EngD_hardrive backup/UCL_DemandLogic"
-    # harddrive_idfs="D:/EngD_hardrive/UCL_DemandLogic"
     idfdir=os.path.dirname(os.path.abspath(__file__))+"\IDFs"
     epdir="C:/EnergyPlusV8-6-0"
 else:
@@ -2387,22 +2384,6 @@ def run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, 
     df_inputs.to_csv(csv_outfile[:-4]+'final.csv', index=False)
 
 def main():
-    print("{}".format(rootdir) + "/" + building_name + ".idf")
-    idf1 = IDF("{}".format(rootdir) + "/" + building_name + ".idf")
-    if print_statements is True: print(idf1)
-
-    lhd = doe_lhs.lhs(no_variables, samples=n_samples)
-    print(lhd.shape)
-
-    run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, no_simplifications, remove_sql, add_variables, run_periods, n_samples, from_samples, save_idfs, overtime_multiplier_equip, overtime_multiplier_light, multiplier_variation, seasonal_occ_factor_week, seasonal_occ_factor_weekend)
-
-    # if print_statements is True: print idf1.idfobjects['PEOPLE'][0].objls #fieldnames
-    # if print_statements is True: print idf1.idfobjects['ELECTRICEQUIPMENT'][0].objls #fieldnames
-    # if print_statements is True: print idf1.idfobjects['LIGHTS'][0].fieldnames
-
-if __name__ == '__main__':
-    def start():
-        if print_statements is True: print('start')
 
     BuildingAbbreviations = ['MPEB', 'CH', '17', '71', 'Nothing']
     BuildingHardDisk = ['05_MaletPlaceEngineering_Project', '01_CentralHouse_Project', '02_BuroHappold_17', '03_BuroHappold_71']
@@ -2525,5 +2506,22 @@ if __name__ == '__main__':
     if not os.path.exists(save_dir):  # check if folder exists
         os.makedirs(save_dir)  # create new folder
 
+    print("{}".format(rootdir) + "/" + building_name + ".idf")
+    idf1 = IDF("{}".format(rootdir) + "/" + building_name + ".idf")
+    if print_statements is True: print(idf1)
+
+    lhd = doe_lhs.lhs(no_variables, samples=n_samples)
+    print(lhd.shape)
+
+    run_lhs(idf1, lhd, building_name, building_abr, base_case, simplifications, no_simplifications, remove_sql, add_variables, run_periods, n_samples, from_samples, save_idfs, overtime_multiplier_equip, overtime_multiplier_light, multiplier_variation, seasonal_occ_factor_week, seasonal_occ_factor_weekend)
+
+    # if print_statements is True: print idf1.idfobjects['PEOPLE'][0].objls #fieldnames
+    # if print_statements is True: print idf1.idfobjects['ELECTRICEQUIPMENT'][0].objls #fieldnames
+    # if print_statements is True: print idf1.idfobjects['LIGHTS'][0].fieldnames
+
+if __name__ == '__main__':
+    def start__main__():
+        print('start')
+    start__main__()
 
     main()
